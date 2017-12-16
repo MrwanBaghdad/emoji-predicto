@@ -14,7 +14,10 @@ DOTS_regex = re.compile(r'\.{2,}')  # 2 dots or more
 UNICODE_DOTS_regex = re.compile(r'…')
 SPACES_regex = re.compile(r'\s{2,}')  # 2 spaces or more
 UNICODE_SPACES_regex = re.compile(r'️')
-SYMBOLS_regex = re.compile(r'[@\-ـ_:#/"\'%\[\]\n]')
+SYMBOLS_regex = re.compile(r'[@\-ـ_:#/"\'%\[\]\n&]')
+
+# URL regex source: http://www.noah.org/wiki/RegEx_Python
+URL_regex = re.compile(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')
 
 stopwords = stopwords.words('english')
 stopwords = ['\\b' + x.strip() + '\\b' for x in stopwords if x.strip() != '']
@@ -41,6 +44,10 @@ def process_hashtags(original_text):
     return cleaned_text
 
 
+def remove_url(original_text):
+    return URL_regex.sub(' ', original_text)
+
+
 def remove_symbols(original_text):
     cleaned_text = DOTS_regex.sub('.', original_text)
     cleaned_text = UNICODE_DOTS_regex.sub('.', cleaned_text)
@@ -53,6 +60,7 @@ def remove_symbols(original_text):
 # noinspection PyShadowingNames
 def process_tweet(tweet):
     tweet = unescape(tweet)
+    tweet = remove_url(tweet)
     tweet = process_hashtags(tweet)
     tweet = remove_user_keyword(tweet)
     tweet = remove_stop_words(tweet)
