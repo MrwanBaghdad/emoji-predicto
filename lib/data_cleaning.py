@@ -1,28 +1,33 @@
 # coding: utf-8
 
 import re
+import string
+import time
 from xml.sax.saxutils import unescape
 
 from nltk.corpus import stopwords
+from nltk.tokenize import TweetTokenizer
 
 from lib.word_segmentation import segment
 
 # Regex's
 USER_regex = re.compile(r'@user')
 NUMBERS_regex = re.compile(r'[\u0030-\u0039]+')
-DOTS_regex = re.compile(r'\.{2,}')  # 2 dots or more
-UNICODE_DOTS_regex = re.compile(r'…')
+DOTS_regex = re.compile(r'((\s*)?\.(\s*)?){2,}')  # 2 dots or more
+UNICODE_DOTS_regex = re.compile(r'…|️…|・・・')
 SPACES_regex = re.compile(r'\s{2,}')  # 2 spaces or more
+EXCLAMATION_regex = re.compile(r'!{2,}')
 UNICODE_SPACES_regex = re.compile(r'️')
-SYMBOLS_regex = re.compile(r'[@\-ـ_:#/"\'%\[\]\n&]')
+SYMBOLS_regex = re.compile(r'[@\-ـ_:#/"\'%\[\]\n&~()“”—•▃]')
 
 # URL regex source: http://www.noah.org/wiki/RegEx_Python
 URL_regex = re.compile(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')
 
-stopwords = stopwords.words('english')
-stopwords = ['\\b' + x.strip() + '\\b' for x in stopwords if x.strip() != '']
-stopwords = '|'.join(stopwords)
-STOP_WORDS_regex = re.compile(stopwords)
+stopwords = set(stopwords.words('english')) - {'no', 'not'}
+STOP_WORDS_regex = '\\b(' + '|'.join(stopwords) + ')\\b'
+STOP_WORDS_regex = re.compile(STOP_WORDS_regex)
+
+tokenizer = TweetTokenizer()
 
 
 def remove_user_keyword(original_text):
@@ -49,16 +54,21 @@ def remove_url(original_text):
 
 
 def remove_symbols(original_text):
-    cleaned_text = DOTS_regex.sub('.', original_text)
+    cleaned_text = EXCLAMATION_regex.sub('!', original_text)
     cleaned_text = UNICODE_DOTS_regex.sub('.', cleaned_text)
+    cleaned_text = DOTS_regex.sub('.', cleaned_text)
     cleaned_text = SYMBOLS_regex.sub(' ', cleaned_text)
     cleaned_text = UNICODE_SPACES_regex.sub(' ', cleaned_text)
 
     return cleaned_text
 
 
+def pad_dot(original_text):
+    return original_text.replace('.', ' . ')
+
+
 # noinspection PyShadowingNames
-def process_tweet(tweet):
+def clean_tweet(tweet):
     tweet = unescape(tweet)
     tweet = remove_url(tweet)
     tweet = process_hashtags(tweet)
@@ -67,12 +77,40 @@ def process_tweet(tweet):
 
     tweet = NUMBERS_regex.sub('', tweet)
     tweet = remove_symbols(tweet)
+    tweet = pad_dot(tweet)
     tweet = SPACES_regex.sub(' ', tweet)  # must be final
     return tweet.strip()
 
 
+# noinspection PyShadowingNames
+def tokenize_tweet(tweet):
+    tweet = tokenizer.tokenize(tweet)
+    punctuation = set(string.punctuation)
+
+    tweet = [token for token in tweet
+             if token.lower() not in stopwords and token.lower() not in punctuation]
+
+    return tweet
+
+
+# noinspection PyShadowingNames
+def process_tweet(tweet):
+    tweet = clean_tweet(tweet)
+    tweet = tokenize_tweet(tweet)
+
+    return tweet
+
+
+tweets = list()
 if __name__ == '__main__':
+    # tweet = 'Little dirt session. 360 can can. @user @ Woodward West Camp'
+
+    start = time.time()
+
     for tweet in open('../data/text'):
         print(tweet.replace('\n', ''))
         print(process_tweet(tweet))
         print()
+        tweets.append(process_tweet(tweet))
+
+    print('Time: %.3f s' % (time.time() - start))
