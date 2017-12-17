@@ -6,6 +6,7 @@ import time
 from xml.sax.saxutils import unescape
 
 from nltk.corpus import stopwords
+from nltk.stem import SnowballStemmer, WordNetLemmatizer
 from nltk.tokenize import TweetTokenizer
 
 from lib.word_segmentation import segment
@@ -27,7 +28,10 @@ stopwords = set(stopwords.words('english')) - {'no', 'not'}
 STOP_WORDS_regex = '\\b(' + '|'.join(stopwords) + ')\\b'
 STOP_WORDS_regex = re.compile(STOP_WORDS_regex)
 
+# Load NLTK classes
 tokenizer = TweetTokenizer()
+lemm = WordNetLemmatizer()
+stemmer = SnowballStemmer('english')  # not used yet
 
 
 def remove_user_keyword(original_text):
@@ -90,6 +94,8 @@ def tokenize_tweet(tweet):
     tweet = [token for token in tweet
              if token.lower() not in stopwords and token.lower() not in punctuation]
 
+    tweet = [lemm.lemmatize(word) for word in tweet]
+
     return tweet
 
 
@@ -101,16 +107,18 @@ def process_tweet(tweet):
     return tweet
 
 
-tweets = list()
-if __name__ == '__main__':
-    # tweet = 'Little dirt session. 360 can can. @user @ Woodward West Camp'
+# noinspection PyShadowingNames
+def process_tweets(tweets):
+    _tweets = list()
+    for tweet in tweets:
+        _tweets.append(process_tweet(tweet))
 
+    return _tweets
+
+
+if __name__ == '__main__':
     start = time.time()
 
-    for tweet in open('../data/text'):
-        print(tweet.replace('\n', ''))
-        print(process_tweet(tweet))
-        print()
-        tweets.append(process_tweet(tweet))
+    tweets = process_tweets(open('../data/text'))
 
     print('Time: %.3f s' % (time.time() - start))

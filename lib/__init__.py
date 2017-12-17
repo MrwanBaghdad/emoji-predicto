@@ -1,1 +1,1 @@
-from lib.data_cleaning import process_tweet
+from lib.data_cleaning import process_tweets
