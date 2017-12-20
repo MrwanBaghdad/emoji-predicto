@@ -3,7 +3,7 @@
 from functools import wraps
 # import nltk
 # WORDS = set(nltk.corpus.brown.words())
-WORDS = set(open('../data/words.txt').read().splitlines())
+WORDS = set(open('../data/dict/words.txt').read().splitlines())
 
 
 def memoize(f):
@@ -23,7 +23,7 @@ def memoize(f):
     return wraps(f)(_c)
 
 
-# @memoize
+@memoize
 def segment(sentence):
     """
     Segment a string of chars using the brown nltk corpus.

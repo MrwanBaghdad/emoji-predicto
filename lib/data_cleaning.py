@@ -2,7 +2,7 @@
 
 import re
 import string
-import time
+from time import time
 from xml.sax.saxutils import unescape
 
 from nltk.corpus import stopwords
@@ -19,7 +19,7 @@ UNICODE_DOTS_regex = re.compile(r'…|️…|・・・')
 SPACES_regex = re.compile(r'\s{2,}')  # 2 spaces or more
 EXCLAMATION_regex = re.compile(r'!{2,}')
 UNICODE_SPACES_regex = re.compile(r'️')
-SYMBOLS_regex = re.compile(r'[@\-ـ_:#/"\'%\[\]\n&~()“”—•▃]')
+SYMBOLS_regex = re.compile(r'[' + string.punctuation + '’¿“”—•▃¯ツ]')
 
 # URL regex source: http://www.noah.org/wiki/RegEx_Python
 URL_regex = re.compile(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')
@@ -29,7 +29,7 @@ STOP_WORDS_regex = '\\b(' + '|'.join(stopwords) + ')\\b'
 STOP_WORDS_regex = re.compile(STOP_WORDS_regex)
 
 # Load NLTK classes
-tokenizer = TweetTokenizer()
+tokenizer = TweetTokenizer(reduce_len=True)
 lemm = WordNetLemmatizer()
 stemmer = SnowballStemmer('english')  # not used yet
 
@@ -89,10 +89,9 @@ def clean_tweet(tweet):
 # noinspection PyShadowingNames
 def tokenize_tweet(tweet):
     tweet = tokenizer.tokenize(tweet)
-    punctuation = set(string.punctuation)
 
     tweet = [token for token in tweet
-             if token.lower() not in stopwords and token.lower() not in punctuation]
+             if token.lower() not in stopwords]
 
     tweet = [lemm.lemmatize(word) for word in tweet]
 
@@ -117,8 +116,9 @@ def process_tweets(tweets):
 
 
 if __name__ == '__main__':
-    start = time.time()
+    tweets = open('../data/maro_text').read().splitlines()
 
-    tweets = process_tweets(open('../data/text'))
+    start = time()
+    tweets = process_tweets(tweets)
 
-    print('Time: %.3f s' % (time.time() - start))
+    print('Time: %.3f s' % (time() - start))
