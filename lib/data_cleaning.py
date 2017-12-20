@@ -115,6 +115,13 @@ def process_tweets(tweets):
     return _tweets
 
 
+def clean_tweets(tweets):
+    _tweets = list()
+    for tweet in tweets:
+        _tweets.append(clean_tweet(tweet))
+    return _tweets
+
+
 if __name__ == '__main__':
     tweets = open('../data/maro_text').read().splitlines()
 
