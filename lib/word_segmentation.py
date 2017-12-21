@@ -1,9 +1,7 @@
 # coding: utf-8
-
 from functools import wraps
-# import nltk
-# WORDS = set(nltk.corpus.brown.words())
-WORDS = set(open('../data/dict/words.txt').read().splitlines())
+
+WORDS = set(open('data/dict/words.txt').read().splitlines())
 
 
 def memoize(f):
@@ -51,6 +49,8 @@ def segment(sentence):
         else:  # no matching segments were found
             # return as is
             return [sentence]
+
+    words = [word for word in words if len(word) > 1]
     # return segmentation
     return words
 
