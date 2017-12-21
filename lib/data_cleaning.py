@@ -162,7 +162,19 @@ if __name__ == '__main__':
         f.write(tweet + '\n')
 
     tokenized_tweets = tokenize_tweets(cleaned_tweets)
+    labels = open('../data/all_labels', 'r').read().splitlines()
+
+    for idx, tweet in enumerate(tokenized_tweets):
+        if not tweet:
+            labels.pop(idx)
+
+    tokenized_tweets = [tweet for tweet in tokenized_tweets if tweet]
 
     pickle.dump(tokenized_tweets, open('../data/tokenized_tweets.pic', 'wb'))
+
+    tok_labels_file = open('../data/cleaned_labels', 'w')
+    for label in labels:
+        tok_labels_file.write(label + '\n')
+    tok_labels_file.close()
 
     print('Time %.3f s' % (time() - start))
