@@ -1,11 +1,11 @@
 import pickle
-
+from os.path import abspath
 import fasttext
 import numpy as np
 from sklearn.model_selection import train_test_split
 
 # noinspection PyUnresolvedReferences
-model = fasttext.load_model('data/model.bin')
+model = fasttext.load_model(abspath('../data/model.bin'))
 
 
 # ref: https://stats.stackexchange.com/a/239071

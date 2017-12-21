@@ -104,3 +104,4 @@ ENV/
 
 data/
 !data/.keep
+.pickles/

@@ -8,7 +8,7 @@ import nltk
 from nltk.corpus import stopwords
 from nltk.stem import SnowballStemmer, WordNetLemmatizer
 from nltk.tokenize import TweetTokenizer
-
+from os.path import abspath
 from lib.word_segmentation import segment
 
 # Regex's
@@ -153,16 +153,16 @@ if __name__ == '__main__':
 
     start = time()
 
-    tweets = open('../data/all_tweets').read().splitlines()
+    tweets = open(abspath('../data/all_tweets')).read().splitlines()
 
     cleaned_tweets = clean_tweets(tweets)
 
-    f = open('../data/cleaned_tweets', 'w')
+    f = open(abspath('../data/cleaned_tweets'), 'w')
     for tweet in cleaned_tweets:
         f.write(tweet + '\n')
 
     tokenized_tweets = tokenize_tweets(cleaned_tweets)
-    labels = open('../data/all_labels', 'r').read().splitlines()
+    labels = open(abspath('../data/all_labels'), 'r').read().splitlines()
 
     for idx, tweet in enumerate(tokenized_tweets):
         if not tweet:
@@ -170,9 +170,9 @@ if __name__ == '__main__':
 
     tokenized_tweets = [tweet for tweet in tokenized_tweets if tweet]
 
-    pickle.dump(tokenized_tweets, open('../data/tokenized_tweets.pic', 'wb'))
+    pickle.dump(tokenized_tweets, open(abspath('../data/tokenized_tweets.pic'), 'wb'))
 
-    tok_labels_file = open('../data/cleaned_labels', 'w')
+    tok_labels_file = open(abspath('../data/cleaned_labels'), 'w')
     for label in labels:
         tok_labels_file.write(label + '\n')
     tok_labels_file.close()
