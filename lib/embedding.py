@@ -10,5 +10,5 @@ for tweet in tweets:
 
 cleaned_tweets_file.close()
 
-model = fasttext.skipgram('../data/cleaned_tweets', '../data/model')
+model = fasttext.skipgram('../data/cleaned_tweets', '../data/model', dim=10)
 print(len(model.words))

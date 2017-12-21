@@ -20,6 +20,7 @@ SPACES_regex = re.compile(r'\s{2,}')  # 2 spaces or more
 EXCLAMATION_regex = re.compile(r'!{2,}')
 UNICODE_SPACES_regex = re.compile(r'️')
 SYMBOLS_regex = re.compile(r'[' + string.punctuation + '’¿“”—•▃¯ツ]')
+NONENGLISH_regex = re.compile(r'[^a-zA-Z\s.]')
 
 # URL regex source: http://www.noah.org/wiki/RegEx_Python
 URL_regex = re.compile(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')
@@ -71,6 +72,10 @@ def pad_dot(original_text):
     return original_text.replace('.', ' . ')
 
 
+def remove_non_english(original_text):
+    return NONENGLISH_regex.sub(' ', original_text)
+
+
 # noinspection PyShadowingNames
 def clean_tweet(tweet):
     tweet = unescape(tweet)
@@ -81,6 +86,7 @@ def clean_tweet(tweet):
 
     tweet = NUMBERS_regex.sub('', tweet)
     tweet = remove_symbols(tweet)
+    tweet = remove_non_english(tweet)
     tweet = pad_dot(tweet)
     tweet = SPACES_regex.sub(' ', tweet)  # must be final
     return tweet.strip()

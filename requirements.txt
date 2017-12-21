@@ -1,3 +1,5 @@
 nltk
 Cython
 fasttext
+numpy
+scikit-learn
