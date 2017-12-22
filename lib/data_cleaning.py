@@ -60,10 +60,10 @@ def remove_url(original_text):
 
 
 def remove_symbols(original_text):
-    cleaned_text = EXCLAMATION_regex.sub('!', original_text)
-    cleaned_text = UNICODE_DOTS_regex.sub('.', cleaned_text)
-    cleaned_text = DOTS_regex.sub('.', cleaned_text)
-    cleaned_text = SYMBOLS_regex.sub(' ', cleaned_text)
+    # cleaned_text = EXCLAMATION_regex.sub('!', original_text)
+    cleaned_text = UNICODE_DOTS_regex.sub('.', original_text)
+    # cleaned_text = DOTS_regex.sub('.', cleaned_text)
+    # cleaned_text = SYMBOLS_regex.sub(' ', cleaned_text)
     cleaned_text = UNICODE_SPACES_regex.sub(' ', cleaned_text)
 
     return cleaned_text
@@ -105,8 +105,8 @@ def clean_tweet(tweet):
     tweet = remove_duplicate_characters(tweet)
     # tweet = remove_entities(tweet)
     tweet = process_hashtags(tweet)
-    tweet = remove_user_keyword(tweet)
-    tweet = remove_stop_words(tweet)
+    # tweet = remove_user_keyword(tweet)
+    # tweet = remove_stop_words(tweet)
 
     tweet = NUMBERS_regex.sub('', tweet)
     tweet = remove_symbols(tweet)
@@ -120,10 +120,11 @@ def clean_tweet(tweet):
 def tokenize_tweet(tweet):
     tweet = tokenizer.tokenize(tweet)
 
-    tweet = [token for token in tweet
-             if token.lower() not in stopwords and len(token) > 1]
+    # tweet = [token for token in tweet
+    #          if token.lower() not in stopwords and len(token) > 1]
 
-    tweet = [lemm.lemmatize(lemm.lemmatize(word), 'v') for word in tweet]
+    # tweet = [lemm.lemmatize(lemm.lemmatize(word), 'v') for word in tweet]
+    tweet = [stemmer.stem(word) for word in tweet]
 
     return tweet
 
@@ -150,19 +151,20 @@ def tokenize_tweets(tweets):
 if __name__ == '__main__':
     import pickle
     from time import time
+    from lib.data_paths import *
 
     start = time()
 
-    tweets = open('../data/all_tweets').read().splitlines()
+    tweets = open(RAW_TWEETS_PATH).read().splitlines()
 
     cleaned_tweets = clean_tweets(tweets)
 
-    f = open('../data/cleaned_tweets', 'w')
+    f = open(CLEAN_TWEETS_PATH, 'w')
     for tweet in cleaned_tweets:
         f.write(tweet + '\n')
 
     tokenized_tweets = tokenize_tweets(cleaned_tweets)
-    labels = open('../data/all_labels', 'r').read().splitlines()
+    labels = open(RAW_LABELS_PATH, 'r').read().splitlines()
 
     for idx, tweet in enumerate(tokenized_tweets):
         if not tweet:
@@ -170,9 +172,9 @@ if __name__ == '__main__':
 
     tokenized_tweets = [tweet for tweet in tokenized_tweets if tweet]
 
-    pickle.dump(tokenized_tweets, open('../data/tokenized_tweets.pic', 'wb'))
+    pickle.dump(tokenized_tweets, open(TOK_TWEETS_PATH, 'wb'))
 
-    tok_labels_file = open('../data/cleaned_labels', 'w')
+    tok_labels_file = open(CLEAN_LABELS_PATH, 'w')
     for label in labels:
         tok_labels_file.write(label + '\n')
     tok_labels_file.close()

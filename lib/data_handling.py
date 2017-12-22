@@ -4,8 +4,10 @@ import fasttext
 import numpy as np
 from sklearn.model_selection import train_test_split
 
+from lib.data_paths import *
+
 # noinspection PyUnresolvedReferences
-model = fasttext.load_model('data/model.bin')
+model = fasttext.load_model(WORD_EMB_MODEL_PATH + '.bin')
 
 
 # ref: https://stats.stackexchange.com/a/239071
@@ -35,11 +37,11 @@ def split_data(data, labels):
 
 
 if __name__ == '__main__':
-    tokenized_tweets = pickle.load(open('../data/tokenized_tweets.pic', 'rb'))
+    tokenized_tweets = pickle.load(open(TOK_TWEETS_PATH, 'rb'))
     tweet_of_max_length = max(tokenized_tweets, key=len)
 
     data_matrix = construct_data_matrix(tokenized_tweets)
-    labels = open('../data/cleaned_labels').read().splitlines()
+    labels = open(CLEAN_LABELS_PATH).read().splitlines()
 
     data_train, data_test, labels_train, labels_test = split_data(data_matrix, labels)
 

@@ -1,4 +1,6 @@
 import fasttext
 
-model = fasttext.skipgram('../data/cleaned_tweets', '../data/model')
-print(len(model.words))
+from lib.data_paths import *
+
+model = fasttext.skipgram(CLEAN_TWEETS_PATH, WORD_EMB_MODEL_PATH)
+print('Vocab Size:', len(model.words))

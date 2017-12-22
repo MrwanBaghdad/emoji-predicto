@@ -1,7 +1,9 @@
 # coding: utf-8
 from functools import wraps
 
-WORDS = set(open('../data/dict/words.txt').read().splitlines())
+from lib.data_paths import WORD_DICT_PATH
+
+WORDS = set(open(WORD_DICT_PATH).read().splitlines())
 
 
 def memoize(f):
