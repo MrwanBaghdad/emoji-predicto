@@ -67,9 +67,9 @@ def remove_url(original_text):
     return URL_regex.sub(' ', original_text)
 
 
-def remove_symbols(original_text, mode=NORMAL_MODE):
+def remove_symbols(original_text):
     cleaned_text = UNICODE_DOTS_regex.sub('.', original_text)
-    if mode == AGGRESSIVE_MODE: cleaned_text = SYMBOLS_regex.sub(' ', cleaned_text)
+    cleaned_text = SYMBOLS_regex.sub(' ', cleaned_text)
     cleaned_text = UNICODE_SPACES_regex.sub(' ', cleaned_text)
 
     return cleaned_text
@@ -112,13 +112,13 @@ def clean_tweet(tweet, mode=NORMAL_MODE):
 
     if mode == AGGRESSIVE_MODE: tweet = remove_entities(tweet)
     tweet = process_hashtags(tweet, mode)
-    if mode == AGGRESSIVE_MODE: tweet = remove_user_keyword(tweet)
-    if mode == AGGRESSIVE_MODE: tweet = remove_stop_words(tweet)
+    tweet = remove_user_keyword(tweet)
+    tweet = remove_stop_words(tweet)
 
     tweet = NUMBERS_regex.sub('', tweet)
-    tweet = remove_symbols(tweet, mode)
+    tweet = remove_symbols(tweet)
     tweet = remove_non_english(tweet)
-    if mode == AGGRESSIVE_MODE: tweet = pad_dot(tweet)
+    tweet = pad_dot(tweet)
     tweet = SPACES_regex.sub(' ', tweet)  # must be final
     return tweet.strip()
 
