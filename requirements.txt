@@ -3,3 +3,4 @@ Cython
 fasttext
 numpy
 scikit-learn
+compound-word-splitter

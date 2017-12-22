@@ -5,6 +5,7 @@ import string
 from xml.sax.saxutils import unescape
 
 import nltk
+import splitter
 from nltk.corpus import stopwords
 from nltk.stem import SnowballStemmer, WordNetLemmatizer
 from nltk.tokenize import TweetTokenizer
@@ -21,7 +22,7 @@ EXCLAMATION_regex = re.compile(r'!{2,}')
 UNICODE_SPACES_regex = re.compile(r'️')
 SYMBOLS_regex = re.compile(r'[' + string.punctuation + '’¿“”—•▃¯ツ]')
 NONENGLISH_regex = re.compile(r'[^a-zA-Z\s.]')
-DUPLICATES_regex = re.compile(r'\b(\S*?)(.)\2{2,}\b', (re.MULTILINE | re.DOTALL))
+DUPLICATES_regex = re.compile(r'(\s*?)(.)\2{2,}', (re.MULTILINE | re.DOTALL))
 
 # URL regex source: http://www.noah.org/wiki/RegEx_Python
 URL_regex = re.compile(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')
@@ -35,6 +36,10 @@ tokenizer = TweetTokenizer()
 lemm = WordNetLemmatizer()
 stemmer = SnowballStemmer('english')  # not used yet
 
+# Define variables
+NORMAL_MODE = 'normal'
+AGGRESSIVE_MODE = 'aggressive'
+
 
 def remove_user_keyword(original_text):
     return USER_regex.sub('', original_text)
@@ -45,12 +50,15 @@ def remove_stop_words(original_text):
 
 
 # noinspection SpellCheckingInspection
-def process_hashtags(original_text):
+def process_hashtags(original_text, mode=NORMAL_MODE):
     cleaned_text = original_text
     hashtags = set(re.findall(r"#(\w+)", original_text))
-    cleaned_text = cleaned_text.replace('#', ' #')
+    cleaned_text = cleaned_text.replace('#', ' ')
     for hashtag in hashtags:
-        cleaned_text = cleaned_text.replace(hashtag, ' '.join(segment(hashtag)))
+        if mode == AGGRESSIVE_MODE:
+            cleaned_text = cleaned_text.replace(hashtag, ' '.join(splitter.split(hashtag)))
+        else:
+            cleaned_text = cleaned_text.replace(hashtag, ' '.join(segment(hashtag)))
 
     return cleaned_text
 
@@ -59,11 +67,9 @@ def remove_url(original_text):
     return URL_regex.sub(' ', original_text)
 
 
-def remove_symbols(original_text):
-    # cleaned_text = EXCLAMATION_regex.sub('!', original_text)
+def remove_symbols(original_text, mode=NORMAL_MODE):
     cleaned_text = UNICODE_DOTS_regex.sub('.', original_text)
-    # cleaned_text = DOTS_regex.sub('.', cleaned_text)
-    # cleaned_text = SYMBOLS_regex.sub(' ', cleaned_text)
+    if mode == AGGRESSIVE_MODE: cleaned_text = SYMBOLS_regex.sub(' ', cleaned_text)
     cleaned_text = UNICODE_SPACES_regex.sub(' ', cleaned_text)
 
     return cleaned_text
@@ -94,24 +100,25 @@ def remove_entities(original_text):
 
 
 def remove_duplicate_characters(original_text):
-    return DUPLICATES_regex.sub(r'\1\2', original_text)
+    return DUPLICATES_regex.sub(r'\2\2', original_text)
 
 
 # noinspection PyShadowingNames
-def clean_tweet(tweet):
+def clean_tweet(tweet, mode=NORMAL_MODE):
     tweet = tweet.lower()
     tweet = unescape(tweet)
     tweet = remove_url(tweet)
     tweet = remove_duplicate_characters(tweet)
-    # tweet = remove_entities(tweet)
-    tweet = process_hashtags(tweet)
-    # tweet = remove_user_keyword(tweet)
-    # tweet = remove_stop_words(tweet)
+
+    if mode == AGGRESSIVE_MODE: tweet = remove_entities(tweet)
+    tweet = process_hashtags(tweet, mode)
+    if mode == AGGRESSIVE_MODE: tweet = remove_user_keyword(tweet)
+    if mode == AGGRESSIVE_MODE: tweet = remove_stop_words(tweet)
 
     tweet = NUMBERS_regex.sub('', tweet)
-    tweet = remove_symbols(tweet)
+    tweet = remove_symbols(tweet, mode)
     tweet = remove_non_english(tweet)
-    tweet = pad_dot(tweet)
+    if mode == AGGRESSIVE_MODE: tweet = pad_dot(tweet)
     tweet = SPACES_regex.sub(' ', tweet)  # must be final
     return tweet.strip()
 
