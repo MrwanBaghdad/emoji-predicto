@@ -127,11 +127,11 @@ def clean_tweet(tweet, mode=NORMAL_MODE):
 def tokenize_tweet(tweet):
     tweet = tokenizer.tokenize(tweet)
 
-    # tweet = [token for token in tweet
-    #          if token.lower() not in stopwords and len(token) > 1]
+    tweet = [token for token in tweet
+             if token.lower() not in stopwords and len(token) > 1]
 
-    # tweet = [lemm.lemmatize(lemm.lemmatize(word), 'v') for word in tweet]
-    tweet = [stemmer.stem(word) for word in tweet]
+    tweet = [lemm.lemmatize(lemm.lemmatize(word), 'v') for word in tweet]
+    # tweet = [stemmer.stem(word) for word in tweet]
 
     return tweet
 

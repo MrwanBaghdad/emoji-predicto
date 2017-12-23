@@ -1,7 +1,7 @@
 import pickle
 
 import numpy as np
-from sklearn.neural_network import MLPClassifier
+from sklearn.ensemble import RandomForestClassifier
 
 from lib import construct_data_matrix, split_data
 from lib.data_paths import *
@@ -19,14 +19,14 @@ labels = np.asarray(open(CLEAN_LABELS_PATH).read().splitlines())
 data_train, data_test, labels_train, labels_test = split_data(data_matrix, labels)
 print('split data')
 
-clf = MLPClassifier(max_iter=200, verbose=True, alpha=0.001)
-clf.fit(data_matrix, labels)
+estimators = [10, 50, 100]
+depths = [5, 10, 15, 20]
 
-score = clf.predict(data_matrix)
+# for estimator in estimators:
+# for depth in depths:
+clf = RandomForestClassifier(max_depth=3)
+clf.fit(data_train, labels_train)
 
-f = open('english.output.txt', 'w')
-for s in score:
-    f.write(s + '\n')
-f.close()
+score = clf.predict(data_test)
 
-main(labels, score)
+main(labels_test, score)

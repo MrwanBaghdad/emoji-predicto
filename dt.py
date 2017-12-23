@@ -1,7 +1,6 @@
 import pickle
 
 import numpy as np
-from sklearn.model_selection import cross_val_score
 from sklearn.tree import DecisionTreeClassifier
 
 from lib import construct_data_matrix, split_data
@@ -22,8 +21,6 @@ print('split data')
 
 clf = DecisionTreeClassifier(max_depth=10)
 clf.fit(data_train, labels_train)
-scores = cross_val_score(clf, data_matrix, labels, cv=10)
-print("Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * 2))
 print('trained decision tree')
 
 print(clf.score(data_test, labels_test))

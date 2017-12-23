@@ -1,13 +1,14 @@
 import pickle
 
 import numpy as np
-from lib import construct_data_matrix, split_data
-from lib.data_paths import *
-from scorer_semeval18 import main as eval
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.naive_bayes import BernoulliNB
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import RandomForestClassifier
+
+from lib import construct_data_matrix, split_data
+from lib.data_paths import *
+from scorer_semeval18 import main as eval
 
 tokenized_tweets = pickle.load(open(TOK_TWEETS_PATH, 'rb'))
 print('loaded tweets')
